@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Minecraft AFK Bot Dashboard</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; max-width: 900px; margin: 36px auto; padding: 0 18px; color:#111 }
+    header { display:flex; gap:12px; align-items:center; }
+    h1 { margin:0; font-size:1.4rem }
+    .card { border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); padding:16px; margin-top:18px; background:#fff }
+    .muted { color:#666; font-size:0.95rem }
+    button { padding:8px 12px; border-radius:8px; border: none; cursor:pointer }
+    .btn-primary { background:#0b74de; color:white }
+    .btn-danger { background:#d64545; color:white }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    pre { background:#f6f8fa; padding:12px; border-radius:6px; overflow:auto }
+    footer { margin-top:28px; color:#666; font-size:0.9rem }
+    .status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Minecraft AFK Bot — Netlify Dashboard</h1>
+    <div class="muted">server: <strong id="serverAddr">my-mc.link:35247</strong></div>
+  </header>
+
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="muted">Server status</div>
+        <div style="margin-top:6px">
+          <span id="statusDot" class="status-dot" style="background:#ccc"></span>
+          <strong id="statusText">Unknown</strong>
+          <span class="muted" id="playersText" style="margin-left:10px"></span>
+        </div>
+      </div>
+      <div class="row">
+        <button id="btnRefresh" class="btn-primary">Refresh</button>
+        <button id="btnJoin" class="btn-primary">Request Bot Join</button>
+        <button id="btnLeave" class="btn-danger">Request Bot Leave</button>
+      </div>
+    </div>
+
+    <hr style="margin:14px 0">
+
+    <div class="muted">Logs</div>
+    <pre id="logArea" style="height:220px">Logs will appear here...</pre>
+  </section>
+
+  <footer>
+    Tip: The server at <code>http://my-mc.link:35247</code> must expose JSON endpoints:
+    <code>/status</code> (GET), <code>/join</code> (POST), <code>/leave</code> (POST). Enable CORS.
+  </footer>
+
+  <script>
+    // =========== CONFIG ===========
+    const SERVER = 'http://my-mc.link:35247' // <-- your address
+    const STATUS_ENDPOINT = SERVER + '/status'
+    const JOIN_ENDPOINT = SERVER + '/join'
+    const LEAVE_ENDPOINT = SERVER + '/leave'
+    const POLL_MS = 8000
+
+    // =========== UI ===========
+    const statusText = document.getElementById('statusText')
+    const statusDot = document.getElementById('statusDot')
+    const playersText = document.getElementById('playersText')
+    const logArea = document.getElementById('logArea')
+    const btnRefresh = document.getElementById('btnRefresh')
+    const btnJoin = document.getElementById('btnJoin')
+    const btnLeave = document.getElementById('btnLeave')
+
+    function log(msg) {
+      const t = new Date().toLocaleTimeString()
+      logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch(STATUS_ENDPOINT, { method: 'GET' })
+        if (!res.ok) throw new Error('HTTP ' + res.status)
+        const json = await res.json()
+        // expected JSON: { online: true, players: 3, motd: "..." }
+        if (json.online) {
+          statusDot.style.background = '#2ecc71'
+          statusText.textContent = 'Online'
+        } else {
+          statusDot.style.background = '#f39c12'
+          statusText.textContent = 'Offline'
+        }
+        playersText.textContent = json.players !== undefined ? `Players: ${json.players}` : ''
+        log('Status fetched: ' + JSON.stringify(json))
+      } catch (e) {
+        statusDot.style.background = '#e74c3c'
+        statusText.textContent = 'Unreachable'
+        playersText.textContent = ''
+        log('Status error: ' + e.message)
+      }
+    }
+
+    async function postAction(url, body = {}) {
+      try {
+        log('Calling ' + url)
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+        if (!res.ok) {
+          const txt = await res.text()
+          throw new Error('HTTP ' + res.status + ' - ' + txt)
+        }
+        const json = await res.json()
+        log('Response: ' + JSON.stringify(json))
+        return json
+      } catch (e) {
+        log('Action error: ' + e.message)
+        throw e
+      }
+    }
+
+    btnRefresh.addEventListener('click', fetchStatus)
+    btnJoin.addEventListener('click', () => {
+      btnJoin.disabled = true
+      postAction(JOIN_ENDPOINT, { reason: 'web:join' })
+        .catch(()=>{})
+        .finally(()=> btnJoin.disabled = false)
+    })
+    btnLeave.addEventListener('click', () => {
+      btnLeave.disabled = true
+      postAction(LEAVE_ENDPOINT, { reason: 'web:leave' })
+        .catch(()=>{})
+        .finally(()=> btnLeave.disabled = false)
+    })
+
+    // poll status periodically
+    fetchStatus()
+    setInterval(fetchStatus, POLL_MS)
+  </script>
+</body>
+</html>
