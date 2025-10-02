@@ -1,18 +1,12 @@
 {
-  "name": "minecraft-afk-bot",
+  "name": "mc-afk-dashboard",
   "version": "1.0.0",
-  "description": "Minecraft AFK bot with small movements",
-  "main": "bot.js",
+  "private": true,
   "scripts": {
-    "start": "node bot.js",
-    "dev": "nodemon bot.js"
+    "build": "echo 'no build - static site' && cp index.html dist/index.html",
+    "start": "serve dist"
   },
-  "engines": {
-    "node": ">=18.x"
-  },
-  "dependencies": {
-    "mineflayer": "^4.20.0",
-    "mineflayer-pathfinder": "^2.4.0",
-    "vec3": "^0.1.8"
+  "devDependencies": {
+    "serve": "^14.0.1"
   }
 }
