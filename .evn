@@ -1,6 +1,6 @@
 # .env - keep this file private and chmod 600
-LOGIN_URL=https://panel.yoursite.com/login
-DASHBOARD_URL=https://panel.yoursite.com/server/3129bd1e
+LOGIN_URL=https://panel.freegamehost.xyz/auth/login
+DASHBOARD_URL=https://panel.freegamehost.xyz/server/3129bd1e
 
 # replace with your credentials on your machine only (do not paste them here publicly)
 USERNAME=godex616@gmail.com
