@@ -1,0 +1,26 @@
+# .env - keep this file private and chmod 600
+LOGIN_URL=https://panel.yoursite.com/login
+DASHBOARD_URL=https://panel.yoursite.com/server/3129bd1e
+
+# replace with your credentials on your machine only (do not paste them here publicly)
+USERNAME=godex616@gmail.com
+PASSWORD=yourPasswordHere
+
+# Selectors - set these by inspecting your page
+EMAIL_SELECTOR=input[name="godex616@gmail.com"]
+PASSWORD_SELECTOR=input[name="fHd28@Uwa9HTYi@"]
+LOGIN_BUTTON_SELECTOR=button[type="submit"]
+RENEW_BUTTON_SELECTOR=button.purple-renew
+CONFIRM_BUTTON_SELECTOR=button.confirm-yes
+
+# Selector of the element which contains remaining time text (example: "16:52:00" or "16h 52m")
+REMAINING_SELECTOR=.time-remaining  # replace with the real selector
+
+# Renew when remaining time is less than this many minutes.
+RENEW_THRESHOLD_MINUTES=50
+
+# Headless (set to "false" to see browser)
+HEADLESS=true
+
+# file to store cookies
+COOKIE_FILE=./cookies.json
