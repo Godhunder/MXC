@@ -1,12 +1,12 @@
 {
-  "name": "mc-afk-dashboard",
+  "name": "renew-bot",
   "version": "1.0.0",
-  "private": true,
+  "main": "renew-puppeteer.js",
   "scripts": {
-    "build": "echo 'no build - static site' && cp index.html dist/index.html",
-    "start": "serve dist"
+    "start": "node renew-puppeteer.js"
   },
-  "devDependencies": {
-    "serve": "^14.0.1"
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "puppeteer": "^21.0.0"
   }
 }
